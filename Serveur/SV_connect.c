@@ -68,7 +68,8 @@ while(erreur>=0) {
                   }
             if (msgsnd(msqid,&message,strlen(message.txt)+1,0) <0)
                   {
-                  printf("Srv:erreur INFOC :%d",CPID);
+                    perror("ReceptionClients");
+                  printf("Srv:erreur INFOC :%d\n",CPID);
               continue;
                   }
               message.type = ACK;
