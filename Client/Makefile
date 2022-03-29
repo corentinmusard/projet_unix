@@ -1,30 +1,27 @@
-# Fichier Makefile
+SRC_DIR := .
+OBJ_DIR := .
+BIN_DIR := .
 
-CC = gcc
-CFLAGS = -g -Wall -Wextra -D _GNU_SOURCE 
-CFLAG2 = -c -Wall -Wextra -D _GNU_SOURCE 
-OBJETS = CL.o CL_msg.o CL_mem.o CL_sem.o
+SRC := $(wildcard $(SRC_DIR)/*.c)
+OBJ := $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
-all: cl
 
-cl : $(OBJETS) CL.c
-	$(CC) $(CFLAGS) $(OBJETS) -o CL
+CC := gcc
+CFLAGS := -g --std=c11 -pedantic -D _GNU_SOURCE -D _POSIX_C_SOURCE=1 -Wall -Wextra
+EXE := CL
 
-CL.o : CL.c CL_include CL_msg.h CL_mem.h
-	$(CC) $(CFLAG2) CL.c -o CL.o
+.PHONY: all clean
 
-CL_msg.o : CL_msg.c CL_include CL_msg.h
-	$(CC) $(CFLAG2) CL_msg.c -o CL_msg.o
+all: ${EXE}
 
-CL_mem.o : CL_mem.c CL_include CL_mem.h
-	$(CC) $(CFLAG2) CL_mem.c -o CL_mem.o
+$(EXE): $(OBJ) | $(BIN_DIR)
+	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
-CL_sem.o : CL_sem.c CL_include CL_sem.h
-	$(CC) $(CFLAG2) CL_sem.c -o CL_sem.o
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+
+$(BIN_DIR):
+	mkdir -p $@
 
 clean:
-	@rm -f *~ *.o CL 
-
-
-
-
+	${RM} ${OBJ} ${EXE}
