@@ -12,23 +12,23 @@ void LireData(BUF *Tptr, int Voie) {
 }
 
 void lecteur1(int Semid, int SemidClient, BUF *Tptr){
+    P(SemidClient,0);
+    LireData(Tptr,0);
+    V(SemidClient,0);
+}
+void lecteur2(int Semid, int SemidClient, BUF *Tptr){
     P(SemidClient,1);
     LireData(Tptr,1);
     V(SemidClient,1);
 }
-void lecteur2(int Semid, int SemidClient, BUF *Tptr){
-    P(SemidClient,2);
-    LireData(Tptr,2);
-    V(SemidClient,2);
-}
 void fonction1(/*int sig*/) {
   printf("ICI 1\n");
-  flag = 1;
+    flag = 1;
 }
 
 void fonction2(/*int sig*/) {
   printf("ICI 2\n");
-  flag = 2;
+    flag = 2;
 }
 
 int main() {
@@ -52,6 +52,10 @@ int main() {
       perror("CreationMutex");
       exit(0);
     }
+    if(Init_Mutex(SemidClient,1)==SEMerr){
+        printf("Error Init Mutex");
+        exit(3);
+    }
     int fils1,fils2;
     
     if((fils1=fork()) == -1){
@@ -70,22 +74,20 @@ int main() {
         lecteur2(Semid,SemidClient,Tptr);
         exit(10);
     }
-
-  int i = 0;
-  while (i < 10) {
-    while (flag == 0) {
-      pause();
+    //P(SemidClient,1);
+    //P(SemidClient,2);
+    while(1){
+        pause();
+        if (flag == 1){
+            V(SemidClient,1);
+            flag = 0;
+        }
+        if(flag == 2){
+            V(SemidClient,2);
+            flag = 0;
+        }
     }
-    printf("flag=%d\n", flag);
-    P(Semid, flag);
-    LireData(Tptr, flag - 1);
-    V(Semid, flag);
-    flag = 0;
-    i++;
-  }
 
-  while (1)
-    ;
   // pour chaque canaux
   // fork
   // si lecteur

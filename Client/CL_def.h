@@ -7,7 +7,7 @@
 #define CL_DEF
 
 #define CleServeur "/tmp/CleSrv"
-
+#define CleClient "/tmp/CleClt"
 #define C_Msg 'M'
 #define C_Shm 'T'
 
