@@ -12,19 +12,28 @@ void LireData(BUF *Tptr, int Voie) {
 }
 
 void lecteur1(int Semid, int SemidClient, BUF *Tptr){
-    printf("AVANT P CANAL 1\n");
-    P(SemidClient,0);
-    printf("APRES P CANAL 1\n");
-    LireData(Tptr,0);
-    V(SemidClient,0);
+    while(1){
+        printf("AVANT P CANAL 1\n");
+        P(SemidClient,0);
+        P(Semid,0);
+        printf("APRES P CANAL 1\n");
+        LireData(Tptr,0);
+        V(Semid,0);
+    }
+
 }
 void lecteur2(int Semid, int SemidClient, BUF *Tptr){
-    printf("AVANT P CANAL 2\n");
-    P(SemidClient,1);
-    printf("APRES P CANAL 2\n");
-    LireData(Tptr,1);
-    V(SemidClient,1);
+    while(1){
+        printf("AVANT P CANAL 2\n");
+        P(SemidClient,1);
+        P(Semid,1);
+        printf("APRES P CANAL 2\n");
+        LireData(Tptr,1);
+        V(Semid,1);
+    }
+    
 }
+
 void fonction1(/*int sig*/) {
   printf("ICI 1\n");
     flag = 1;
@@ -52,14 +61,11 @@ int main() {
     int Tshmid = getTampon(&Tptr, cle.txt);
     //Creation de la mutex client
     int SemidClient;
-    if ((SemidClient = CreationMutexClient()) == -1) {
+    if ((SemidClient = CreationMutexClient(cle.txt)) == -1) {
       perror("CreationMutex");
       exit(0);
     }
-    if(Init_Mutex(SemidClient,1)==SEMerr){
-        printf("Error Init Mutex");
-        exit(3);
-    }
+
     int fils1,fils2;
     
     if((fils1=fork()) == -1){
@@ -74,7 +80,7 @@ int main() {
         printf("ERREUR FORK FILS2");
         exit(8);
     }
-    if(fils1 == 0){
+    if(fils2 == 0){
         lecteur2(Semid,SemidClient,Tptr);
         exit(10);
     }

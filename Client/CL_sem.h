@@ -4,7 +4,7 @@
 #include "CL_include"
 
 int CreationMutex(void);
-int CreationMutexClient(void);
+int CreationMutexClient(char *cle);
 int DestructionMutex(int);
 int Init_Mutex(int, int);
 int P(int, int);

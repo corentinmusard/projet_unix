@@ -17,10 +17,10 @@ int CreationMutex(void) {
   return semid;
 }
 
-int CreationMutexClient(void) {
+int CreationMutexClient(char *cle) {
   key_t key;
   int semid;
-  if ((key = ftok(CleClient, 'F')) < 0) // CrŽation d'une clŽe client
+  if ((key = ftok(cle, 'F')) < 0) // CrŽation d'une clŽe client
     return CLEerr;
   semid = semget(key, NVOIES, 0666|IPC_CREAT);
   return semid;
