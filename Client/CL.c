@@ -6,6 +6,21 @@
 
 static volatile sig_atomic_t flag;
 
+void LireData(BUF *Tptr, int Voie) {
+  int n = (Tptr + Voie)->n; // + voies a verifier si utile
+  printf("lire:%d\n", (Tptr + Voie)->tampon[n]);
+}
+
+void lecteur1(int Semid, int SemidClient, BUF *Tptr){
+    P(SemidClient,1);
+    LireData(Tptr,1);
+    V(SemidClient,1);
+}
+void lecteur2(int Semid, int SemidClient, BUF *Tptr){
+    P(SemidClient,2);
+    LireData(Tptr,2);
+    V(SemidClient,2);
+}
 void fonction1(/*int sig*/) {
   printf("ICI 1\n");
   flag = 1;
@@ -14,11 +29,6 @@ void fonction1(/*int sig*/) {
 void fonction2(/*int sig*/) {
   printf("ICI 2\n");
   flag = 2;
-}
-
-void LireData(BUF *Tptr, int Voie) {
-  int n = (Tptr + Voie)->n;
-  printf("lire:%d\n", (Tptr + Voie)->tampon[n]);
 }
 
 int main() {
@@ -34,9 +44,32 @@ int main() {
     perror("CreationMutex");
     exit(0);
   }
-
-  BUF *Tptr;
-  int Tshmid = getTampon(&Tptr, cle.txt);
+    BUF *Tptr;
+    int Tshmid = getTampon(&Tptr, cle.txt);
+    //Creation de la mutex client
+    int SemidClient;
+    if ((SemidClient = CreationMutexClient()) == -1) {
+      perror("CreationMutex");
+      exit(0);
+    }
+    int fils1,fils2;
+    
+    if((fils1=fork()) == -1){
+        printf("ERREUR FORK FILS1");
+        exit(8);
+    }
+    if(fils1 == 0){
+        lecteur1(Semid,SemidClient,Tptr);
+        exit(10);
+    }
+    if((fils2=fork()) == -1){
+        printf("ERREUR FORK FILS2");
+        exit(8);
+    }
+    if(fils1 == 0){
+        lecteur2(Semid,SemidClient,Tptr);
+        exit(10);
+    }
 
   int i = 0;
   while (i < 10) {

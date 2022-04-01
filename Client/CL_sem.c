@@ -17,6 +17,15 @@ int CreationMutex(void) {
   return semid;
 }
 
+int CreationMutexClient(void) {
+  key_t key;
+  int semid;
+  if ((key = ftok(CleClient, 'F')) < 0) // CrŽation d'une clŽe client
+    return CLEerr;
+  semid = semget(key, NVOIES, 0666|IPC_CREAT);
+  return semid;
+}
+
 /*********************	DESTRUCTION DU MUTEX
  *  ENTREE: semid = identificateur de la famille de semaphores
  *  SORTIE: neant
