@@ -12,12 +12,16 @@ void LireData(BUF *Tptr, int Voie) {
 }
 
 void lecteur1(int Semid, int SemidClient, BUF *Tptr){
+    printf("AVANT P CANAL 1\n");
     P(SemidClient,0);
+    printf("APRES P CANAL 1\n");
     LireData(Tptr,0);
     V(SemidClient,0);
 }
 void lecteur2(int Semid, int SemidClient, BUF *Tptr){
+    printf("AVANT P CANAL 2\n");
     P(SemidClient,1);
+    printf("APRES P CANAL 2\n");
     LireData(Tptr,1);
     V(SemidClient,1);
 }
@@ -79,11 +83,11 @@ int main() {
     while(1){
         pause();
         if (flag == 1){
-            V(SemidClient,1);
+            V(SemidClient,0);
             flag = 0;
         }
         if(flag == 2){
-            V(SemidClient,2);
+            V(SemidClient,1);
             flag = 0;
         }
     }
