@@ -3,52 +3,35 @@
 #include "CL_mem.h"
 #include "CL_msg.h"
 #include "CL_sem.h"
+#include "CL_Lib.h"
 
+//Variables globales
 static volatile sig_atomic_t flag;
-
-void LireData(BUF *Tptr, int Voie) {
-  int n = (Tptr + Voie)->n; // + voies a verifier si utile
-  printf("lire:%d\n", (Tptr + Voie)->tampon[n]);
-}
-
-void lecteur1(int Semid, int SemidClient, BUF *Tptr){
-    while(1){
-        printf("AVANT P CANAL 1\n");
-        P(SemidClient,0);
-        P(Semid,0);
-        printf("APRES P CANAL 1\n");
-        LireData(Tptr,0);
-        V(Semid,0);
-    }
-
-}
-void lecteur2(int Semid, int SemidClient, BUF *Tptr){
-    while(1){
-        printf("AVANT P CANAL 2\n");
-        P(SemidClient,1);
-        P(Semid,1);
-        printf("APRES P CANAL 2\n");
-        LireData(Tptr,1);
-        V(Semid,1);
-    }
-    
-}
+static int msqid;
+static int Tshmid;
+static int SemidClient;
 
 void fonction1(/*int sig*/) {
-  printf("ICI 1\n");
+  printf("ICI USR 1\n");
     flag = 1;
 }
 
 void fonction2(/*int sig*/) {
-  printf("ICI 2\n");
+  printf("ICI USR 2\n");
     flag = 2;
 }
 
+void end(){
+    printf("\nRelache Mutex\nFin de Fils\n");
+    DestructionMutex(SemidClient);
+    while(wait(NULL)!=-1);
+    kill(0,SIGKILL);
+}
 int main() {
   signal(SIGUSR1, fonction1);
   signal(SIGUSR2, fonction2);
 
-  int msqid = CreationMessagerie();
+  msqid = CreationMessagerie();
 
   dmsgbuf cle = connect(msqid);
 
@@ -58,9 +41,9 @@ int main() {
     exit(0);
   }
     BUF *Tptr;
-    int Tshmid = getTampon(&Tptr, cle.txt);
+    Tshmid = getTampon(&Tptr, cle.txt);
     //Creation de la mutex client
-    int SemidClient;
+    
     if ((SemidClient = CreationMutexClient(cle.txt)) == -1) {
       perror("CreationMutex");
       exit(0);
@@ -84,8 +67,8 @@ int main() {
         lecteur2(Semid,SemidClient,Tptr);
         exit(10);
     }
-    //P(SemidClient,1);
-    //P(SemidClient,2);
+    signal(SIGTERM, end);
+    signal(SIGINT, end);
     while(1){
         pause();
         if (flag == 1){
@@ -104,7 +87,5 @@ int main() {
 
   // sinon
 
-  RelacheMemoires(Tshmid);
-  RelacheMessagerie(msqid);
   return 0;
 }
