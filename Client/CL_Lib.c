@@ -44,12 +44,14 @@ void lecteur2(int Semid, int SemidClient, BUF *Tptr, int p2[2]){
 void redacteur1(int p1[2]){
     int i=0;
     int buf[5] = {0};
+    time_t date;
     while(1){
         close(p1[1]);
         read(p1[0],&buf[i],sizeof(int));
         i++;
         if(i==5){
-            printf("DATA 1 : %d %d %d %d %d\n",buf[0],buf[1],buf[2],buf[3],buf[4]);
+            date = time(NULL);
+            printf("*****************\nDATE : %sDATA 1 : %d %d %d %d %d\n*****************\n",ctime(&date),buf[0],buf[1],buf[2],buf[3],buf[4]);
             i=0;
         }
     }
@@ -58,12 +60,14 @@ void redacteur1(int p1[2]){
 void redacteur2(int p1[2]){
     int i=0;
     int buf[5] = {0};
+    time_t date;
     while(1){
         close(p1[1]);
         read(p1[0],&buf[i],sizeof(int));
         i++;
         if(i==5){
-            printf("DATA 2 : %d %d %d %d %d\n",buf[0],buf[1],buf[2],buf[3],buf[4]);
+            date = time(NULL);
+            printf("*****************\nDATE : %sDATA 2 : %d %d %d %d %d\n*****************\n",ctime(&date),buf[0],buf[1],buf[2],buf[3],buf[4]);
             i=0;
         }
     }
