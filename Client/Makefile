@@ -8,7 +8,7 @@ OBJ := $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
 CC := gcc
 CFLAGS := -g --std=c11 -pedantic -D _GNU_SOURCE -D _POSIX_C_SOURCE=1 -Wall -Wextra
-EXE := CL
+EXE := CL Driver
 
 .PHONY: all clean
 
