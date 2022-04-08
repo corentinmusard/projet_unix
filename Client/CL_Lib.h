@@ -3,9 +3,11 @@
 
 #include "CL_include"
 
-void LireData(BUF *Tptr, int Voie);
-void lecteur1(int Semid, int SemidClient, BUF *Tptr);
-void lecteur2(int Semid, int SemidClient, BUF *Tptr);
+int LireData(BUF *Tptr, int Voie);
+void lecteur1(int Semid, int SemidClient, BUF *Tptr, int p1[2]);
+void lecteur2(int Semid, int SemidClient, BUF *Tptr, int p2[2]);
+void redacteur1(int p1[2]);
+void redacteur2(int p1[2]);
 
 #endif
 

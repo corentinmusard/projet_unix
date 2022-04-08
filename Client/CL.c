@@ -35,6 +35,7 @@ int main() {
 
   dmsgbuf cle = connect(msqid);
 
+
   int Semid;
   if ((Semid = CreationMutex()) == -1) {
     perror("CreationMutex");
@@ -50,13 +51,23 @@ int main() {
     }
 
     int fils1,fils2;
+    int r1,r2;
+    int p1[2];
+    int p2[2];
     
+    if(pipe(p1)==-1){
+        perror("Erreur pipe 1");
+    }
+    if(pipe(p2)==-1){
+        perror("Erreur pipe 2");
+    }
+
     if((fils1=fork()) == -1){
         printf("ERREUR FORK FILS1");
         exit(8);
     }
     if(fils1 == 0){
-        lecteur1(Semid,SemidClient,Tptr);
+        lecteur1(Semid,SemidClient,Tptr,p1);
         exit(10);
     }
     if((fils2=fork()) == -1){
@@ -64,9 +75,27 @@ int main() {
         exit(8);
     }
     if(fils2 == 0){
-        lecteur2(Semid,SemidClient,Tptr);
+        lecteur2(Semid,SemidClient,Tptr,p2);
         exit(10);
     }
+    if((r1=fork()) == -1){
+        printf("ERREUR FORK FILS1");
+        exit(8);
+    }
+    if(r1 == 0){
+        redacteur1(p1);
+        exit(10);
+    }
+    if((r2=fork()) == -1){
+        printf("ERREUR FORK FILS1");
+        exit(8);
+    }
+    if(r2 == 0){
+        redacteur2(p2);
+        exit(10);
+    }
+    
+
     signal(SIGTERM, end);
     signal(SIGINT, end);
     while(1){
