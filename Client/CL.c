@@ -12,12 +12,19 @@ static int Tshmid;
 static int SemidClient;
 static int Semid_Driver;
 
-void fonction1(/*int sig*/) {
+/**
+ *fonction d'interruprion pour l'USER 1
+ *Modification du flag a 1 quand on est dans l'USER 1
+ */
+void Handler_USR1() {
   printf("ICI USR 1\n");
   flag = 1;
 }
-
-void fonction2(/*int sig*/) {
+/**
+ *fonction d'interruprion pour l'USER 2
+ *Modification du flag a 2 quand on est dans l'USER 2
+ */
+void Handler_USR2() {
   printf("ICI USR 2\n");
   flag = 2;
 }
@@ -30,12 +37,13 @@ void end() {
   kill(0, SIGKILL);
 }
 int main() {
-  signal(SIGUSR1, fonction1);
-  signal(SIGUSR2, fonction2);
+  signal(SIGUSR1, Handler_USR1);
+  signal(SIGUSR2, Handler_USR2);
 
   msqid = CreationMessagerie();
 
   dmsgbuf cle = connect(msqid);
+    //Creation du ficher associe à la CleDriver
   FILE *F;
   F = fopen(CleDriver, "w");
   if (F == NULL) {
@@ -44,14 +52,15 @@ int main() {
   fclose(F);
 
   int Semid;
+    //Recuperation de la mutex seveur (deja cree dans le serveur)
   if ((Semid = CreationMutex()) == -1) {
     perror("CreationMutex");
     exit(0);
   }
   BUF *Tptr;
   Tshmid = getTampon(&Tptr, cle.txt);
+    
   // Creation de la mutex client
-
   if ((SemidClient = CreationMutexClient(cle.txt)) == -1) {
     perror("CreationMutex");
     exit(0);
