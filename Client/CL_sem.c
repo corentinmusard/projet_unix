@@ -22,7 +22,7 @@ int CreationMutexClient(char *cle) {
   int semid;
   if ((key = ftok(cle, 'F')) < 0) // CrŽation d'une clŽe client
     return CLEerr;
-  semid = semget(key, NVOIES, 0666|IPC_CREAT);
+  semid = semget(key, NVOIES, 0666 | IPC_CREAT);
   return semid;
 }
 
