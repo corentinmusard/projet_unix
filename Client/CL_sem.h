@@ -5,6 +5,7 @@
 
 int CreationMutex(void);
 int CreationMutexClient(char *cle);
+int OuvertureMutexClient(char *cle);
 int DestructionMutex(int);
 int Init_Mutex(int, int);
 int P(int, int);

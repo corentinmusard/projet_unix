@@ -49,13 +49,16 @@ void redacteur1(int p1[2],int p3[2],int Semid_Driver){
         close(p1[1]);
         read(p1[0],&buf[i],sizeof(int));
         i++;
+        printf("i1 = %d\n",i);
         if(i==5){
             date = time(NULL);
             //printf("*****************\nDATE : %sDATA 1 : %d %d %d %d %d\n*****************\n",ctime(&date),buf[0],buf[1],buf[2],buf[3],buf[4]);
             P(Semid_Driver,0);
+            printf("pred1\n");
             close(p3[0]);
             write(p3[1],buf,sizeof(buf));
             V(Semid_Driver,0);
+            printf("vred1\n");
             i=0;
         }
     }
@@ -69,13 +72,17 @@ void redacteur2(int p1[2],int p3[2],int Semid_Driver){
         close(p1[1]);
         read(p1[0],&buf[i],sizeof(int));
         i++;
+        printf("i2 = %d\n",i);
+
         if(i==5){
             date = time(NULL);
             //printf("*****************\nDATE : %sDATA 2 : %d %d %d %d %d\n*****************\n",ctime(&date),buf[0],buf[1],buf[2],buf[3],buf[4]);
             P(Semid_Driver,0);
+            printf("pred2\n");
             close(p3[0]);
             write(p3[1],buf,sizeof(buf));
             V(Semid_Driver,0);
+            printf("vred2\n");
             i=0;
         }
     }

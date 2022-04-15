@@ -35,7 +35,12 @@ int main() {
   msqid = CreationMessagerie();
 
   dmsgbuf cle = connect(msqid);
-
+    FILE *F;
+    F = fopen(CleDriver,"w");
+    if(F == NULL){
+        perror("Fichier");
+    }
+    fclose(F);
 
   int Semid;
   if ((Semid = CreationMutex()) == -1) {
@@ -85,6 +90,13 @@ int main() {
         lecteur2(Semid,SemidClient,Tptr,p2);
         exit(10);
     }
+    
+    // Creation de la mutex partagee avec le driver
+    if ((Semid_Driver = CreationMutexClient(CleDriver)) == -1) {
+      perror("CreationMutex pour le driver");
+      exit(0);
+    }
+    V(Semid_Driver,0);
     //Fils redacteur 1 :
     if((r1=fork()) == -1){
         printf("ERREUR FORK FILS REDACTEUR 1");
@@ -103,11 +115,7 @@ int main() {
         redacteur2(p2,p3,Semid_Driver);
         exit(10);
     }
-    // Creation de la mutex partagee avec le driver
-    if ((Semid_Driver = CreationMutexClient(CleDriver)) == -1) {
-      perror("CreationMutex pour le driver");
-      exit(0);
-    }
+
     printf("Mutex Driver : %d\n",Semid_Driver);
     //Creation du troisieme fils de client :
     //Fils qui accede au driver
