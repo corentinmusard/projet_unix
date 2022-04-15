@@ -13,13 +13,12 @@ void read_from_pipe(int fd){
     fscanf(stream,"%d",&c);
     fclose(stream);
 }
-int main(int argc, char *argv[]){
-    
+
+int main(int argc, char *argv[]) {
     int Semid_Driver;
     if ((Semid_Driver = CreationMutexClient(CleDriver)) == -1) {
       perror("CreationMutex");
       exit(0);
     }
-    
-    
+    return 0;
 }
