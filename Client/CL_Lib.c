@@ -41,7 +41,7 @@ void lecteur2(int Semid, int SemidClient, BUF *Tptr, int p2[2]){
     
 }
 
-void redacteur1(int p1[2]){
+void redacteur1(int p1[2],int p3[2],int Semid_Driver){
     int i=0;
     int buf[5] = {0};
     time_t date;
@@ -51,13 +51,17 @@ void redacteur1(int p1[2]){
         i++;
         if(i==5){
             date = time(NULL);
-            printf("*****************\nDATE : %sDATA 1 : %d %d %d %d %d\n*****************\n",ctime(&date),buf[0],buf[1],buf[2],buf[3],buf[4]);
+            //printf("*****************\nDATE : %sDATA 1 : %d %d %d %d %d\n*****************\n",ctime(&date),buf[0],buf[1],buf[2],buf[3],buf[4]);
+            P(Semid_Driver,0);
+            close(p3[0]);
+            write(p3[1],buf,sizeof(buf));
+            V(Semid_Driver,0);
             i=0;
         }
     }
 }
 
-void redacteur2(int p1[2]){
+void redacteur2(int p1[2],int p3[2],int Semid_Driver){
     int i=0;
     int buf[5] = {0};
     time_t date;
@@ -67,7 +71,11 @@ void redacteur2(int p1[2]){
         i++;
         if(i==5){
             date = time(NULL);
-            printf("*****************\nDATE : %sDATA 2 : %d %d %d %d %d\n*****************\n",ctime(&date),buf[0],buf[1],buf[2],buf[3],buf[4]);
+            //printf("*****************\nDATE : %sDATA 2 : %d %d %d %d %d\n*****************\n",ctime(&date),buf[0],buf[1],buf[2],buf[3],buf[4]);
+            P(Semid_Driver,0);
+            close(p3[0]);
+            write(p3[1],buf,sizeof(buf));
+            V(Semid_Driver,0);
             i=0;
         }
     }

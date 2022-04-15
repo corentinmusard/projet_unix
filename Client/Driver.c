@@ -14,11 +14,29 @@ void read_from_pipe(int fd){
     fclose(stream);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]){
+    
+    int p3[2];
     int Semid_Driver;
-    if ((Semid_Driver = CreationMutexClient(CleDriver)) == -1) {
-      perror("CreationMutex");
-      exit(0);
+    int buf[5];
+    if(argc != 4){
+        perror("Mauvais nombre d'arguments");
     }
-    return 0;
+    p3[0]=atoi(argv[1]);
+    //printf("Affichage de l'argument 1 : %d\n",p3[0]);
+    p3[1]=atoi(argv[2]);
+    //printf("Affichage de l'argument 2 : %d\n",p3[1]);
+    Semid_Driver = atoi(argv[3]);
+    //printf("Affichage de l'argument 3 : %d\n",Semid_Driver);*/
+    //Attente d'autorisation pour lire
+    while(1){
+        P(Semid_Driver,0);
+        close(p3[1]);
+        read(p3[0],buf,sizeof(buf));
+        V(Semid_Driver,0);
+        time_t date;
+        date = time(NULL);
+        printf("*****************\nDATE : %sDATA : %d %d %d %d %d\n*****************\n",ctime(&date),buf[0],buf[1],buf[2],buf[3],buf[4]);
+    }
+    
 }
