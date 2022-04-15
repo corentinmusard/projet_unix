@@ -11,9 +11,8 @@ int main(int argc, char *argv[]) {
   int p3[2];
   int Semid_Driver;
   int buf[5];
-    //Test si mauvais nombre d'arguments
-  if (argc != 4) {
-    perror("Mauvais nombre d'arguments");
+  if (argc != 3) {
+    fprintf(stderr, "Mauvais nombre d'arguments\n");
     return 1;
   }
     //Ouverture de la mutex Driver cree dans le client

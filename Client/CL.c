@@ -48,6 +48,7 @@ int main() {
   F = fopen(CleDriver, "w");
   if (F == NULL) {
     perror("Fichier");
+    return 1;
   }
   fclose(F);
 
@@ -55,7 +56,7 @@ int main() {
     //Recuperation de la mutex seveur (deja cree dans le serveur)
   if ((Semid = CreationMutex()) == -1) {
     perror("CreationMutex");
-    exit(0);
+    return 1;
   }
   BUF *Tptr;
   Tshmid = getTampon(&Tptr, cle.txt);
@@ -63,7 +64,7 @@ int main() {
   // Creation de la mutex client
   if ((SemidClient = CreationMutexClient(cle.txt)) == -1) {
     perror("CreationMutex");
-    exit(0);
+    return 1;
   }
 
   int fils1, fils2; // Fils lecteurs 1 et 2
@@ -84,67 +85,64 @@ int main() {
   }
   // Fils lecteur 1 :
   if ((fils1 = fork()) == -1) {
-    printf("ERREUR FORK FILS LECETEUR 1");
-    exit(8);
+    perror("ERREUR FORK FILS LECETEUR 1");
+    return 8;
   }
   if (fils1 == 0) { // Code Lecteur 1
     lecteur1(Semid, SemidClient, Tptr, p1);
-    exit(10);
+    return 10;
   }
   // Fils lecteur 2 :
   if ((fils2 = fork()) == -1) {
-    printf("ERREUR FORK FILS LECETEUR 1");
-    exit(8);
+    perror("ERREUR FORK FILS LECETEUR 1");
+    return 8;
   }
   if (fils2 == 0) { // Code Lecteur 2
     lecteur2(Semid, SemidClient, Tptr, p2);
-    exit(10);
+    return 10;
   }
 
   // Creation de la mutex partagee avec le driver
   if ((Semid_Driver = CreationMutexClient(CleDriver)) == -1) {
     perror("CreationMutex pour le driver");
-    exit(0);
+    return 0;
   }
   V(Semid_Driver, 0);
   // Fils redacteur 1 :
   if ((r1 = fork()) == -1) {
-    printf("ERREUR FORK FILS REDACTEUR 1");
-    exit(8);
+    perror("ERREUR FORK FILS REDACTEUR 1");
+    return 8;
   }
   if (r1 == 0) { // Code redacteur 1
     redacteur1(p1, p3, Semid_Driver);
-    exit(10);
+    return 10;
   }
   // Fils redacteur 2 :
   if ((r2 = fork()) == -1) {
-    printf("ERREUR FORK FILS REDACTEUR 2");
-    exit(8);
+    perror("ERREUR FORK FILS REDACTEUR 2");
+    return 8;
   }
   if (r2 == 0) { // Code redacteur 2
     redacteur2(p2, p3, Semid_Driver);
-    exit(10);
+    return 10;
   }
 
-  printf("Mutex Driver : %d\n", Semid_Driver);
   // Creation du troisieme fils de client :
   // Fils qui accede au driver
   if ((d = fork()) == -1) {
     printf("ERREUR FORK FILS POUR DRIVER");
-    exit(8);
+    return 8;
   }
   if (d == 0) {
     char p3_zero[10];
     sprintf(p3_zero, "%d", p3[0]);
     char p3_un[10];
     sprintf(p3_un, "%d", p3[1]);
-    char Semid_Driver_alpha[10];
-    sprintf(Semid_Driver_alpha, "%d", Semid_Driver);
-    if (execlp("./Driver", "./Driver", p3_zero, p3_un, Semid_Driver_alpha,
+    if (execlp("./Driver", "./Driver", p3_zero, p3_un,
                NULL) == -1) {
       printf("Erreur de execlp\n");
     }
-    exit(10);
+    return 10;
   }
 
   signal(SIGTERM, end);

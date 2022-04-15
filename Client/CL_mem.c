@@ -18,11 +18,6 @@ int getTampon(BUF **Ptr, char *cle) {
   return CLTshmid;
 }
 
-/*********************  DESALLOCATION DES TAMPONS
- *  ENTREE: Tshmid,Cshmid = ID des memoires partagee
- *  SORTIE: neant
- *  RETOUR: code erreur <0 ou  0 ;
- */
 int RelacheMemoires(int Cshmid) {
   int ret = 0;
 
